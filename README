@@ -1,0 +1,38 @@
+MemCachePage: the silly memcache page cacher
+
+MemCachePage is a plugin that helps deliver the one-two speed superpunch of Nginx and Memcached. It will assist you in caching the response of your controller actions in a format easily fetchable by Nginx's Memcached capabilities.
+
+
+
+Usage:
+
+In your enviroment files, configure MemCachePage appropriately...
+
+# file: config/environments/production.rb
+MemCachePage.configure do |config|
+  config.cache_store = Rails.cache
+  config.namespace = 'production'
+  config.use_md5   = true
+end
+
+Then in your controller, call #mem_caches_page followed by the actions to cache and the cache options.
+
+class ThingsController < ApplicationController
+  mem_caches_page :index, :expires_in => 300
+end
+
+
+
+Future features:
+
+Since the cache keys depend on the current request URI, there's no way to reliably expire the cache at will. Therefore it's a good idea to set an expiration.
+
+Tying into the above, there currently isn't a way to specify your own algorithm for making cache keys.
+
+Also, just like caches_page, mem_caches_page is just a little wrapper around after_filter with a convenience method added in. However, for simplicity's sake, mem_caches_page only takes options related to the cache. This means that the usual after_filter options, such as :if, aren't available right now.
+
+
+
+Caveats:
+
+Last but most importantly, this plugin only caches the response body after each request is made. It's up to you to configure your web server in such a way to serve the request out of Memcached directly.
