@@ -36,6 +36,10 @@ describe ActionController::Caching::MemCachePage do
     it "should have default use_md5 false" do
       ActionController::Caching::MemCachePage.use_md5.should be_false
     end
+    
+    it "should have default raw false" do
+      ActionController::Caching::MemCachePage.raw.should be_false
+    end
   end
   
   describe ".configure" do
@@ -45,6 +49,7 @@ describe ActionController::Caching::MemCachePage do
         config.cache_store  = @cache
         config.namespace    = "boogers"
         config.use_md5      = true
+        config.raw          = true
       end
     end
     
@@ -58,6 +63,10 @@ describe ActionController::Caching::MemCachePage do
     
     it "should allow you to set whether or not to use MD5" do
       ActionController::Caching::MemCachePage.use_md5.should be_true
+    end
+    
+    it "should allow you to set whether or not to write data as raw" do
+      ActionController::Caching::MemCachePage.raw.should be_true
     end
   end
 
@@ -111,6 +120,20 @@ describe ActionController::Caching::MemCachePage do
         ActionController::Caching::MemCachePage.cache_store.expects(:write).with("/things", "This is the response body!", { :expires_in => 300 }).at_least_once
         get :index        
       end
-    end    
+    end
+    
+    describe "when raw is true" do
+      before do
+        ActionController::Caching::MemCachePage.configure do |config|
+          config.raw = true
+        end
+      end
+      
+      it "should write keys as raw" do
+        ThingsController.mem_caches_page(:index)
+        ActionController::Caching::MemCachePage.cache_store.expects(:write).with("/things", "This is the response body!", { :raw => true }).at_least_once
+        get :index                
+      end
+    end
   end
 end

@@ -5,7 +5,8 @@ module ActionController
       def self.set_defaults!
         @@cache_store = Rails.cache
         @@namespace   = nil
-        @@use_md5     = false        
+        @@use_md5     = false
+        @@raw         = false
       end
       
       set_defaults!
@@ -32,6 +33,14 @@ module ActionController
       
       def self.use_md5=(bool)
         @@use_md5 = bool
+      end
+      
+      def self.raw
+        @@raw
+      end
+      
+      def self.raw=(bool)
+        @@raw = bool
       end
       
       def self.generate_cache_key(key)
