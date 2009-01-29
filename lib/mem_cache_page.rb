@@ -72,6 +72,7 @@ module ActionController
           return unless perform_caching && caching_allowed
           cache_key = MemCachePage.generate_cache_key(self.request.request_uri)
           cache_options = self.class.read_inheritable_attribute(:"#{self.params[:action]}_cache_options")
+          cache_options.merge(:raw => true) if MemCachePage.raw
           MemCachePage.cache_store.write(cache_key, self.response.body, cache_options)
         end    
       end
